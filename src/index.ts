@@ -1,28 +1,40 @@
 import express from "express";
-import { find_root_sch_from_content, is_sch } from "./ecad-viewer";
+import AdmZip from "adm-zip";
+import multer from "multer";
+import { get_kicad_project_bom_and_ports } from "./parser";
 
 const app = express();
+const upload = multer(); // 使用multer来处理上传的文件
 
-app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb', extended: true}));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-app.post(`/find_root_sch_from_file_map`, async (req, res) => {
+app.post(`/get_kicad_project_bom_and_ports`, upload.single("file"), async (req, res) => {
     try {
-        const { sch_map } = req.body;
-        if(sch_map === undefined){
-             res.status(400).json({ error: "sch_map is required" });
+        if (!req.file) {
+             res.status(400).json({ error: "No file uploaded" });
              return
         }
-        const root_sch_file_name = find_root_sch_from_content(sch_map);
-        if(!is_sch(root_sch_file_name)){
-            res.status(400).json({ error: "root sch file not found" });
-            return
-        }
 
-        res.json({ root_sch_file_name });
-    } catch (e ) {
-      console.log(e);
-        res.json({ error: JSON.stringify(e) });
+        const zip = new AdmZip(req.file.buffer); // 使用上传的文件缓冲区
+        const files: { filename: string; content: string }[] = [];
+
+        // 解压文件，并存储其内容
+        for (const entry of zip.getEntries()) {
+            const filename = entry.entryName;
+            if (!filename.endsWith(".kicad_sch")) continue;
+            const content = zip.readAsText(entry);
+            files.push({
+                filename,
+                content,
+            });
+        }
+        
+        // 使用自定义函数来处理提取的内容
+        res.json(get_kicad_project_bom_and_ports(files));
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: JSON.stringify(e) });
     }
 });
 
@@ -33,5 +45,5 @@ app.get("/feed", async (req, res) => {
 app.listen(7123, () =>
     console.log(`
 🚀 Server ready at: http://localhost:7123
-⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`),
+⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
 );

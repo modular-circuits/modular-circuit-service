@@ -2,7 +2,7 @@ name: Publish to Docker
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 permissions:
@@ -19,7 +19,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/Huaqiu-Electronics/ecad-viewer-cli
+          images: ghcr.io/Huaqiu-Electronics/modular-circuit-service
           tags: latest
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -45,7 +45,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: registry.cn-shanghai.aliyuncs.com/kicad/ecad-viewer-cli
+          images: registry.cn-shanghai.aliyuncs.com/kicad/modular-circuit-service
           tags: latest
       - name: Login to aliyun
         uses: docker/login-action@v3
