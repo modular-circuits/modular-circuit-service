@@ -215,7 +215,15 @@ export class KicadSch {
   get_global_powers() {
     const pws: unknown[] = []
     for (const it of this.symbols.values()) {
-      if (is_global_pwr_symbol(it.reference)) pws.push(mk_obj_deep_cp_omitting_properties_recursive(it, 'parent'))
+      if (is_global_pwr_symbol(it.reference))
+        pws.push({
+          ...mk_obj_deep_cp_omitting_properties_recursive(it, 'parent'),
+          Reference: it.reference,
+          Value: it.value,
+          Footprint: it.footprint,
+          Datasheet: it.datasheet,
+          Description: it.description,
+        })
     }
     return pws
   }
