@@ -212,18 +212,26 @@ export class KicadSch {
     return this.title_block.resolve_text_var(name)
   }
 
+  get_hiera_labels() {
+    const lbs: Record<string, HierarchicalLabel> = {}
+    for (const it of this.hierarchical_labels) {
+      lbs[it.text] = it
+    }
+    return lbs
+  }
+
   get_global_powers() {
-    const pws: unknown[] = []
+    const pws: Record<string, unknown> = {}
     for (const it of this.symbols.values()) {
       if (is_global_pwr_symbol(it.reference))
-        pws.push({
+        pws[it.value] = {
           ...mk_obj_deep_cp_omitting_properties_recursive(it, 'parent'),
           Reference: it.reference,
           Value: it.value,
           Footprint: it.footprint,
           Datasheet: it.datasheet,
           Description: it.description,
-        })
+        }
     }
     return pws
   }

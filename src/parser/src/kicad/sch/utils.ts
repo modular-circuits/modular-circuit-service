@@ -13,7 +13,7 @@ export function get_kicad_project_bom_and_ports(blobs: EcadBlob[]) {
   return {
     bom: hierarchy.bom_items,
     ports: {
-      hierarchy_labels: hierarchy.root_sch!.hierarchical_labels,
+      hierarchy_labels: hierarchy.root_sch!.get_hiera_labels(),
       global_pwr_ports: hierarchy.root_sch!.get_global_powers(),
     },
   }
