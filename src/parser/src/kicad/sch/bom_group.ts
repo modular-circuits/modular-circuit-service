@@ -26,4 +26,17 @@ export class BomGroup implements BomItem {
     public Footprint: string,
     public DNP: boolean,
   ) {}
+
+  toJSON() {
+    return {
+      DNP: this.DNP,
+      Datasheet: this.Datasheet,
+      Description: this.Description,
+      Footprint: this.Footprint,
+      Name: this.Name,
+      Price: this.Price,
+      Quantity: this.Qty,
+      Designators: this.#references,
+    }
+  }
 }
